@@ -193,7 +193,7 @@ def build_agent(gemini_api_key: str, vectorstore: FAISS):
 
     # --- LLM ---
     llm = ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model="gemini-2.0-flash",
         google_api_key=gemini_api_key,
         temperature=0.2,
         convert_system_message_to_human=False,
