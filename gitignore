@@ -1,9 +1,0 @@
-.env
-.streamlit/secrets.toml
-__pycache__/
-*.pyc
-*.pyo
-.DS_Store
-venv/
-.venv/
-faiss_index/
