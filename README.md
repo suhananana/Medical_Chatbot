@@ -1,127 +1,85 @@
-# 🏥 MediBot — Medical RAG Chatbot
+# 🏥 MediBot — Medical RAG Chatbot (Streamlit)
 
-**LangChain · LangGraph · Gemini 1.5 Flash · FAISS · Wikipedia · Streamlit**
-
----
-
-## 🗂️ Project Structure
-
-```
-medibot_streamlit/
-├── app.py                  ← Streamlit UI
-├── agent.py                ← LangGraph agent + tools + vector store
-├── requirements.txt
-├── .gitignore
-└── .streamlit/
-    ├── config.toml         ← Theme & server settings
-    └── secrets.toml        ← (optional) pre-fill API key
-```
+A fully interactive Medical AI Chatbot powered by **LangChain + LangGraph + FAISS + TinyLlama**.
 
 ---
 
-## ⚙️ Local Setup
-
-### 1. Clone / copy this folder
+## 🚀 Quick Start (Local)
 
 ```bash
-cd medibot_streamlit
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv venv
-source venv/bin/activate        # Windows: venv\Scripts\activate
-```
-
-### 3. Install dependencies
-
-```bash
+# 1. Install dependencies
 pip install -r requirements.txt
-```
 
-### 4. Get a Gemini API key (free)
-
-👉 https://aistudio.google.com/app/apikey
-
-### 5. Run the app
-
-```bash
+# 2. Run the app
 streamlit run app.py
 ```
 
-Open http://localhost:8501 in your browser.
+Then open **http://localhost:8501** in your browser.
 
 ---
 
-## 🌐 Deploy on Streamlit Cloud (free)
+## ☁️ Deploy on Streamlit Community Cloud (Free)
 
-1. Push this folder to a **GitHub repository**.
-2. Go to https://share.streamlit.io → **New app**.
-3. Point it at `app.py` in your repo.
-4. In **Advanced settings → Secrets**, add:
-   ```toml
-   GEMINI_API_KEY = "AIza..."
-   ```
-5. Click **Deploy** — done!
+1. Push this folder to a **GitHub repo**
+2. Go to [share.streamlit.io](https://share.streamlit.io)
+3. Click **New app** → select your repo → set `app.py` as the main file
+4. Click **Deploy**
+
+> **Tip:** Add your `HUGGINGFACEHUB_API_TOKEN` as a Secret in the Streamlit Cloud dashboard so users don't need to enter it manually.
+
+To use a pre-set token from secrets, add this near the top of `app.py`:
+```python
+import streamlit as st
+HF_TOKEN = st.secrets.get("HUGGINGFACEHUB_API_TOKEN", "")
+```
 
 ---
 
-## 🤖 Architecture
+## 🔑 Hugging Face Token
+
+Get a **free** token at https://huggingface.co/settings/tokens  
+You need **Read** access. No payment required for TinyLlama.
+
+---
+
+## 🧱 Architecture
 
 ```
-User Input
+User Query
     │
     ▼
-┌─────────────┐
-│  LangGraph  │  ← ReAct loop (max 15 iterations)
-│   Agent     │
-└──────┬──────┘
-       │  LLM decides which tool(s) to call
-       ▼
-┌──────────────────────────────────────────┐
-│              Tool Node                   │
-│  1. medical_rag_retriever  (FAISS)       │
-│  2. wikipedia              (live search) │
-│  3. symptom_checker        (rule-based)  │
-└──────────────────┬───────────────────────┘
-                   │ results injected back
-                   ▼
-              Final Answer
+[Streamlit UI]
+    │
+    ▼
+[LangGraph ReAct Agent]
+    │
+    ├──► Tool 1: medical_rag_retriever  (FAISS local KB from Wikipedia)
+    ├──► Tool 2: wikipedia_live_tool    (live Wikipedia fallback)
+    └──► Tool 3: symptom_checker        (rule-based symptom mapper)
+    │
+    ▼
+[TinyLlama-1.1B-Chat] (local inference via HuggingFace transformers)
+    │
+    ▼
+[Chat Response → Streamlit UI]
 ```
 
-### Components
+---
 
-| Component     | Technology                              |
-|---------------|-----------------------------------------|
-| LLM           | Google Gemini 1.5 Flash                 |
-| Embeddings    | `all-MiniLM-L6-v2` (HuggingFace)       |
-| Vector Store  | FAISS (in-memory)                       |
-| Knowledge Base| 12 medical Wikipedia topics (~24 pages) |
-| Orchestration | LangGraph StateGraph                    |
-| UI            | Streamlit                               |
+## 📦 Stack
+
+| Component     | Technology                               |
+|---------------|------------------------------------------|
+| 🖥️ UI         | Streamlit                                |
+| 🤖 LLM        | TinyLlama/TinyLlama-1.1B-Chat-v1.0       |
+| 🧠 Embeddings | sentence-transformers/all-MiniLM-L6-v2   |
+| 📚 Vector DB  | FAISS (in-memory)                        |
+| 🌐 Knowledge  | Wikipedia (50 medical topics)            |
+| 🔗 Orchestration | LangGraph ReAct Agent                 |
 
 ---
 
-## 🔧 Tools
+## ⚠️ Disclaimer
 
-| Tool                   | Trigger                                  |
-|------------------------|------------------------------------------|
-| `medical_rag_retriever`| Any medical question (tried first)       |
-| `wikipedia`            | Extra detail / up-to-date info           |
-| `symptom_checker`      | User describes symptoms                  |
-
----
-
-## 💬 Example Questions
-
-- "What is diabetes mellitus and how is it treated?"
-- "I have fever, cough, and fatigue — what could it be?"
-- "How does the immune system fight cancer?"
-- "What are the side effects of antibiotics?"
-- "Explain hypertension and its risk factors."
-
----
-
-> ⚠️ **Disclaimer:** For educational purposes only.  
-> Always consult a qualified healthcare professional.
+MediBot is for **educational purposes only**.  
+Always consult a licensed healthcare professional for medical advice.
