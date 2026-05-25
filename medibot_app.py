@@ -5,8 +5,8 @@ from typing_extensions import TypedDict
 from time import sleep
 
 # ── API Keys — paste your actual keys here ───────────────────────────────────
-os.environ["GOOGLE_API_KEY"] = "your_gemini_key_here"
-os.environ["GROQ_API_KEY"]   = "your_groq_key_here"
+os.environ["GOOGLE_API_KEY"] = "AIzaSyCnGcbkX1irj4rl0VD_llv_B3Ke1d3F3Go"
+os.environ["GROQ_API_KEY"]   = "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"
 # os.environ["OPENAI_API_KEY"] = "your_openai_key_here"  # optional
 
 # ── Page config ────────────────────────────────────────────────────────────────
