@@ -1,45 +1,54 @@
-# 🏥 MediBot — Medical RAG Chatbot
+# 🏥 MediBot — Medical AI Assistant (Streamlit)
 
-A clean, seamless ChatGPT-style medical chatbot.  
-No setup screens. Just open and chat.
+A clean, chat-style Streamlit app powered by your Medical RAG Chatbot notebook.
 
----
+## Features
+- Hybrid RAG (FAISS semantic + BM25 keyword) via Reciprocal Rank Fusion
+- 6 tools: Hybrid RAG, FAISS RAG, BM25 RAG, Live Wikipedia, Symptom Checker, Drug Info
+- Multi-LLM support: Gemini 2.5 Flash · GPT-4o-mini · Groq Llama
+- Tool attribution badges on every response
+- Multi-turn conversation memory
 
-## 🚀 Run locally
+## Setup
 
+### 1. Install dependencies
 ```bash
-# 1. Install
 pip install -r requirements.txt
+```
 
-# 2. Add your HF token
+### 2. Set your API key(s)
+Copy `.env.example` to `.env` and fill in at least one key:
+```bash
 cp .env.example .env
-# edit .env → paste your token
+# then edit .env
+```
 
-# 3. Launch
+**Priority order:** Gemini → OpenAI → Groq (first available key is used)
+
+| Provider | Get Key | Free Tier |
+|----------|---------|-----------|
+| Google Gemini | https://aistudio.google.com/app/apikey | 1500 req/day |
+| OpenAI | https://platform.openai.com/api-keys | Pay-per-use |
+| Groq | https://console.groq.com | 500K TPD (8b model) |
+
+### 3. Run the app
+```bash
 streamlit run app.py
 ```
 
-Open **http://localhost:8501**
+The app opens at `http://localhost:8501`.
 
----
+> **Note:** First launch takes ~60 seconds to load the Wikipedia knowledge base (~60 articles) and build the FAISS index. Subsequent runs are instant thanks to Streamlit's `@st.cache_resource`.
 
-## ☁️ Deploy on Streamlit Cloud (free)
+## File Structure
+```
+medibot_app/
+├── app.py          # Streamlit UI
+├── backend.py      # RAG pipeline, tools, LangGraph agent
+├── requirements.txt
+├── .env.example    # API key template
+└── README.md
+```
 
-1. Push folder to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io) → New app → pick repo → `app.py`
-3. Under **Settings → Secrets**, add:
-   ```
-   HUGGINGFACEHUB_API_TOKEN = "hf_your_token_here"
-   ```
-4. Deploy
-
----
-
-## 🔑 HF Token
-
-Free token → https://huggingface.co/settings/tokens (Read access is enough)
-
----
-
-## ⚠️ Disclaimer
-Educational purposes only. Always consult a licensed healthcare professional.
+## Disclaimer
+MediBot is for **educational purposes only**. Always consult a qualified healthcare professional for medical advice, diagnosis, or treatment.
