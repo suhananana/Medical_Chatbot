@@ -225,7 +225,6 @@ def initialise(groq_api_key: str):
 - Call drug_information when a drug is named.
 - Use wikipedia_live_tool for extra depth or unknown topics.
 - Structure answers with headers and bullet points.
-- Always end with a '🔧 Sources & Tools Used' section listing each tool invoked.
 - Finish with the medical disclaimer.
 
 *Medical Disclaimer: For educational purposes only. Always consult a qualified healthcare professional.*"""
@@ -269,24 +268,7 @@ def initialise(groq_api_key: str):
     graph.add_edge('tools', 'agent')
     agent = graph.compile()
 
-    TOOL_LABELS = {
-        'hybrid_rag_retriever': 'Hybrid RAG (FAISS + BM25)',
-        'faiss_rag_retriever':  'FAISS Semantic RAG',
-        'bm25_rag_retriever':   'BM25 Keyword RAG',
-        'wikipedia_live_tool':  'Live Wikipedia',
-        'symptom_checker':      'Symptom Checker',
-        'drug_information':     'Drug Information DB',
-    }
-    TOOL_DESCRIPTIONS = {
-        'hybrid_rag_retriever': 'FAISS semantic + BM25 keyword via Reciprocal Rank Fusion',
-        'faiss_rag_retriever':  'Dense vector similarity — local Wikipedia KB',
-        'bm25_rag_retriever':   'TF-IDF keyword matching — local Wikipedia KB',
-        'wikipedia_live_tool':  'Real-time Wikipedia API lookup',
-        'symptom_checker':      'Rule-based symptom-to-condition mapper with urgency levels',
-        'drug_information':     'Local drug DB: dosage, side effects, contraindications, interactions',
-    }
-
-    return agent, TOOL_LABELS, TOOL_DESCRIPTIONS, HumanMessage, AIMessage, SystemMessage
+    return agent, HumanMessage, AIMessage, SystemMessage
 
 
 # ── Sidebar ──────────────────────────────────────────────────────────────────
@@ -328,7 +310,7 @@ with st.sidebar:
 
 # ── Main area ─────────────────────────────────────────────────────────────────
 st.markdown("## 🏥 MediBot — Medical Chatbot")
-st.caption("Hybrid RAG· Groq Llama-3.3-70b · Tool Attribution")
+st.caption("Hybrid RAG · Groq Llama-3.3-70b")
 
 # Guard: key required
 if not groq_key:
@@ -337,34 +319,29 @@ if not groq_key:
 
 # Initialise pipeline (cached after first run)
 try:
-    agent, TOOL_LABELS, TOOL_DESCRIPTIONS, HumanMessage, AIMessage, SystemMessage = initialise(groq_key)
+    agent, HumanMessage, AIMessage, SystemMessage = initialise(groq_key)
 except Exception as e:
     st.error(f"Initialisation failed: {e}")
     st.stop()
 
 # ── Chat state ────────────────────────────────────────────────────────────────
 if "messages" not in st.session_state:
-    st.session_state.messages = []          # list of {"role", "content", "tools_used"}
+    st.session_state.messages = []
 
 # Render history
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"], avatar="🧑" if msg["role"] == "user" else "🏥"):
         st.markdown(msg["content"])
-        if msg.get("tools_used"):
-            with st.expander("🔧 RAG Tools Used", expanded=False):
-                for t in msg["tools_used"]:
-                    st.markdown(f"✅ **{TOOL_LABELS.get(t, t)}**  \n&nbsp;&nbsp;&nbsp;_{TOOL_DESCRIPTIONS.get(t, '')}_")
 
 # ── Input ─────────────────────────────────────────────────────────────────────
 if prompt := st.chat_input("Ask a medical question…"):
-    # Show user message
-    st.session_state.messages.append({"role": "user", "content": prompt, "tools_used": []})
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user", avatar="🧑"):
         st.markdown(prompt)
 
     # Build LangGraph history
     lc_history = []
-    for m in st.session_state.messages[:-1]:   # exclude the new message (added below)
+    for m in st.session_state.messages[:-1]:
         if m["role"] == "user":
             lc_history.append(HumanMessage(content=m["content"]))
         else:
@@ -381,15 +358,9 @@ if prompt := st.chat_input("Ask a medical question…"):
                 )
                 ai_msgs = [m for m in result["messages"] if isinstance(m, AIMessage)]
                 reply = ai_msgs[-1].content if ai_msgs else "⚠️ No response received."
-                tools_used = result.get("tools_used", [])
             except Exception as e:
                 reply = f"⚠️ Agent error: {e}"
-                tools_used = []
 
         st.markdown(reply)
-        if tools_used:
-            with st.expander("🔧 RAG Tools Used", expanded=True):
-                for t in tools_used:
-                    st.markdown(f"✅ **{TOOL_LABELS.get(t, t)}**  \n&nbsp;&nbsp;&nbsp;_{TOOL_DESCRIPTIONS.get(t, '')}_")
 
-    st.session_state.messages.append({"role": "assistant", "content": reply, "tools_used": tools_used})
+    st.session_state.messages.append({"role": "assistant", "content": reply})
