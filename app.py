@@ -7,7 +7,7 @@ from typing_extensions import TypedDict
 
 # ── Page config (must be first Streamlit call) ──────────────────────────────
 st.set_page_config(
-    page_title="🏥 MediBot — Medical RAG Chatbot",
+    page_title="🏥 MediBot — Medical Chatbot",
     page_icon="🏥",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -327,9 +327,8 @@ with st.sidebar:
     """)
 
 # ── Main area ─────────────────────────────────────────────────────────────────
-st.markdown("## 🏥 MediBot — Medical RAG Chatbot")
-st.caption("Hybrid RAG (FAISS + BM25) · 6 Tools · Groq Llama-3.3-70b · Tool Attribution")
-st.warning("⚠️ For educational purposes only. Always consult a qualified healthcare professional.", icon="⚕️")
+st.markdown("## 🏥 MediBot — Medical Chatbot")
+st.caption("Hybrid RAG· Groq Llama-3.3-70b · Tool Attribution")
 
 # Guard: key required
 if not groq_key:
