@@ -233,7 +233,7 @@ def initialise(groq_api_key: str):
         messages:   Annotated[list, add_messages]
         tools_used: List[str]
 
-    llm = ChatGroq(model='llama-3.3-70b-versatile', api_key=groq_api_key,
+    llm = ChatGroq(model='llama-3.1-8b-instant', api_key=groq_api_key,
                    temperature=0.2, max_tokens=1024)
     llm_with_tools = llm.bind_tools(tools)
     tool_node = ToolNode(tools)
