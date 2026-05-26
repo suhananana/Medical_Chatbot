@@ -233,7 +233,7 @@ def initialise(groq_api_key: str):
         messages:   Annotated[list, add_messages]
         tools_used: List[str]
 
-    llm = ChatGroq(model='llama-3.1-8b-instant', api_key=groq_api_key,
+    llm = ChatGroq(model='llama3-groq-70b-8192-tool-use-preview', api_key=groq_api_key,
                    temperature=0.2, max_tokens=1024)
     llm_with_tools = llm.bind_tools(tools)
     tool_node = ToolNode(tools)
@@ -286,7 +286,7 @@ with st.sidebar:
     st.divider()
     st.markdown("**🔧 Stack**")
     st.markdown("""
-- 🤖 LLM: `Llama-3.3-70b` (Groq)
+- 🤖 LLM: `llama3-groq-70b-8192` (Groq)
 - 🧠 Embeddings: `all-MiniLM-L6-v2`
 - 📚 Vector DB: FAISS + BM25
 - 🌐 Knowledge: Wikipedia (55 topics)
@@ -310,7 +310,7 @@ with st.sidebar:
 
 # ── Main area ─────────────────────────────────────────────────────────────────
 st.markdown("## 🏥 MediBot — Medical Chatbot")
-st.caption("Hybrid RAG · Groq Llama-3.3-70b")
+st.caption("Hybrid RAG · Groq Llama-70b Tool Use")
 
 # Guard: key required
 if not groq_key:
